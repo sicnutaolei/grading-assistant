@@ -1,0 +1,23 @@
+# 密钥与运行产物
+secrets/
+logs/
+node_modules/
+tools/
+
+# 一次性调试文件
+fixtures/live-canvas.txt
+fixtures/xkw/
+
+# 说明：fixtures 里的真实学生答卷扫描件只保留在私有仓库，公开前请移除
+
+# 一次性截图
+fixtures/verify-before-fill.png
+fixtures/live-300-1-1-shot.png
+
+# 真实学生答卷：仅本地保留，不进仓库
+fixtures/answer-226-1-1.png
+fixtures/live-300-1-1.png
+fixtures/yw/real-1.png
+fixtures/yw/real-1-2x.png
+fixtures/yw/real-2.png
+fixtures/yw/real-2-page.png

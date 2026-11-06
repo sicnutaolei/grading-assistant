@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>阅卷助手设置</title>
+<style>
+body{font:14px/1.7 "Microsoft YaHei",system-ui,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#222;}
+h1{font-size:20px;} h2{font-size:16px;margin-top:28px;}
+textarea{width:100%;min-height:220px;font:12px/1.5 Consolas,monospace;padding:8px;border:1px solid #d0d7de;border-radius:5px;box-sizing:border-box;}
+label{display:block;margin:14px 0 4px;font-weight:600;}
+input,select{width:100%;padding:7px 9px;border:1px solid #d0d7de;border-radius:5px;font-size:13px;box-sizing:border-box;}
+small{color:#666;font-weight:400;}
+.row{display:flex;gap:10px;} .row>div{flex:1;}
+button{margin-top:16px;padding:8px 18px;border:0;border-radius:5px;background:#2d6cdf;color:#fff;cursor:pointer;font-size:14px;}
+button.ghost{background:#f6f8fa;color:#222;border:1px solid #d0d7de;}
+#msg{margin-top:10px;padding:8px;border-radius:5px;background:#f6f8fa;min-height:20px;white-space:pre-wrap;}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
+th,td{border-bottom:1px solid #eee;padding:5px 6px;text-align:left;}
+code{background:#f6f8fa;padding:1px 5px;border-radius:3px;}
+.warnbox{margin:18px 0 6px;padding:10px 12px;border:1px solid #f0c36d;background:#fff4e5;border-radius:6px;color:#8a6d1a;font-size:13px;line-height:1.6;}
+</style></head><body>
+<h1>阅卷助手 · 化学第16题</h1>
+<p>在网页阅卷系统里一键识别答题卡、按内置细则判分并填入分值。<b>工具永远不会点击"提交分数"。</b></p>
+<label>判分细则 <small>（答题卡属于哪套题）</small></label>
+<select id="rubric" style="width:100%;padding:7px 9px;border:1px solid #d0d7de;border-radius:5px;font-size:13px;box-sizing:border-box"></select>
+<label>API Key <small>（DeepSeek 控制台创建的 sk- 开头密钥；只存在本机浏览器扩展里，不进代码、不进 git）</small></label>
+<input type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
+<div class="row">
+  <div><label>Base URL</label><input id="baseUrl"></div>
+  <div><label>模型</label><input id="model" placeholder="deepseek-flash"></div>
+  <div><label>思维链</label><select id="thinking" style="width:100%;padding:7px 9px;border:1px solid #d0d7de;border-radius:5px;font-size:13px;box-sizing:border-box"><option value="off">关闭（快，约 1.7s）</option><option value="on">开启（慢，约 4.5s）</option></select></div>
+</div>
+<div class="row"><div><label>单次请求超时（毫秒）</label><input id="timeoutMs" placeholder="120000"></div><div><label>图片长边上限（像素） <small>越大越清楚也越贵</small></label><input id="maxEdge" placeholder="1600"></div></div>
+<div class="warnbox"><b>重要：光大阅卷系统里"点分值按钮"本身就是提交。</b><br>
+工具从不点击"提交分数"按钮，但点击 0~14 的分值按钮会直接落库并跳到下一份。开启自动提交前请确认这一点。</div>
+<label>自动提交 <small>（默认关闭：判分后仍需你点一次"提交分值"）</small></label>
+<select id="autoSubmit"><option value="false">关闭 —— 判分后等我确认</option><option value="true">开启 —— 判分后自动点分值（即提交）</option></select>
+<div class="row">
+  <div><label>提交前倒计时（秒）<small> 0 = 立即</small></label><input id="countdownSec" placeholder="3"></div>
+  <div><label>置信度下限 <small> 低于此值不自动提交</small></label><input id="minConfidence" placeholder="0.6"></div>
+  <div><label>连续模式</label><select id="autoNext"><option value="false">提交后停下</option><option value="true">提交后自动判下一份</option></select></div>
+</div>
+<button id="save">保存</button><button id="test" class="ghost">测试连接</button><button id="clearKey" class="ghost">清除密钥</button>
+<div id="msg">未保存</div>
+<h2>判分记录（本机最近 200 条）</h2>
+<table id="hist"><thead><tr><th>时间</th><th>密号</th><th>总分</th></tr></thead><tbody></tbody></table>
+<h2>使用说明</h2>
+<ol>
+<li>打开阅卷页面，右下角出现"阅卷助手 · 化学16题"面板即表示已注入。</li>
+<li>下拉框选择答题卡图片（默认面积最大的一张），点"识别并判分"或按 <code>Alt+1</code>。</li>
+<li>核对逐空识别结果与依据，点"填入分值"或按 <code>Alt+2</code>；面板只点击数字按钮，绝不提交。</li>
+<li>若页面图片跨域取不到（提示取图失败），点"粘贴截图"后 <code>Ctrl+V</code> 粘贴你手动截的答题区图片。</li>
+<li>换下一份答卷时重复第 2 步；每份都用全新的云端会话，不会互相串答案。</li>
+</ol>
+<h2>自定义细则（JSON）</h2>
+<p><small>在这里加新题，不用改代码。每套细则形如：<code>{"id":"chem-q20","name":"化学·第20题","subject":"高中化学","itemLabel":"小问","titleLine":"20.（12分）","blanks":[{"id":"a","label":"（1）","max":2,"answer":"...","rules":["..."],"pitfalls":["..."]}]}</small></p>
+<p><small>结构式题在对应条目加 <code>"type":"structure"</code>；要附参考答案图，再加 <code>"standardImage":"图片key"</code>（key 从下面参考图里上传得到）。</small></p>
+<textarea id="customRubrics" spellcheck="false" placeholder='[]'></textarea>
+<div class="row" style="align-items:center">
+  <div><button id="saveRubrics">校验并保存</button><button id="sampleRubric" class="ghost">填入示例</button></div>
+</div>
+<div id="rubricMsg" style="margin-top:8px"></div>
+
+<h2>参考结构图</h2>
+<p><small>上传标准答案的结构图片，得到 key 后在细则里用 <code>standardImage</code> 引用；判分时会把图一起发给模型做原生视觉比对。</small></p>
+<input type="file" id="refImage" accept="image/*" multiple>
+<table id="refTable"><thead><tr><th>key</th><th>文件</th><th>大小</th><th></th></tr></thead><tbody></tbody></table>
+
+<h2>细则内容</h2><div id="rubricText"></div>
+<script src="rubric-core.js"></script><script src="rubric-chem-q16.js"></script><script src="rubric-yw-translate.js"></script><script src="rubrics.js"></script><script src="options.js"></script>
+</body></html>

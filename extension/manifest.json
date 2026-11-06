@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "阅卷助手 · 化学第16题",
+  "version": "0.1.0",
+  "description": "在网页阅卷系统里一键识别答题卡手写内容，按内置细则给出逐空得分与总分，并可代为点击分值按钮（不会提交）。",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "platform.js",
+        "rubric-core.js",
+        "rubric-chem-q16.js",
+        "rubric-yw-translate.js",
+        "rubric-q19.js",
+        "rubrics.js",
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "阅卷助手：点击打开设置"
+  }
+}
